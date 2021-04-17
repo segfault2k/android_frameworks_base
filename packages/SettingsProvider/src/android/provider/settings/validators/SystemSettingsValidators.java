@@ -225,7 +225,6 @@ public class SystemSettingsValidators {
         VALIDATORS.put(System.QS_SHOW_BRIGHTNESS_ABOVE_FOOTER, BOOLEAN_VALIDATOR);
         VALIDATORS.put(System.QS_SHOW_AUTO_BRIGHTNESS, BOOLEAN_VALIDATOR);
         VALIDATORS.put(System.QS_MEDIA_PLAYER, BOOLEAN_VALIDATOR);
-        VALIDATORS.put(System.FOD_GESTURE, BOOLEAN_VALIDATOR);
         VALIDATORS.put(System.TORCH_LONG_PRESS_POWER_GESTURE, BOOLEAN_VALIDATOR);
         VALIDATORS.put(System.TORCH_LONG_PRESS_POWER_TIMEOUT, NON_NEGATIVE_INTEGER_VALIDATOR);
         VALIDATORS.put(System.QS_FOOTER_TEXT_SHOW, BOOLEAN_VALIDATOR);
@@ -251,7 +250,7 @@ public class SystemSettingsValidators {
                                 return false;
                         }
                         return true;
-                    }
-                });
-    }
+          }
+      });
+   }
 }

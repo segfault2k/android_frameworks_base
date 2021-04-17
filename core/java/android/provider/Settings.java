@@ -5239,6 +5239,7 @@ public final class Settings {
          */
         public static final String NETWORK_TRAFFIC_VIEW_LOCATION = "network_traffic_view_location";
 
+        
         /**
          * Whether to show ambient or lockscreen if AoD is disabled
          * and we do a wake gesture like lift to wake or double tap
@@ -5426,12 +5427,10 @@ public final class Settings {
         public static final String STATUSBAR_CLOCK_DATE_FORMAT = "statusbar_clock_date_format";
 
         /**
-         * Screen off fod
+         * Settings dashboard icon style
          * @hide
          */
-        public static final String FOD_GESTURE = "fod_gesture";
-
-public static final String THEMING_SETTINGS_DASHBOARD_ICONS = 
+        public static final String THEMING_SETTINGS_DASHBOARD_ICONS = 
 "theming_settings_dashboard_icons";
         /**
          * Clock font size
@@ -5482,6 +5481,7 @@ public static final String THEMING_SETTINGS_DASHBOARD_ICONS =
          * @hide
          */
         public static final String QS_MEDIA_PLAYER = "qs_media_player";
+
 
         /**
          * Change quick settings tiles animation style
