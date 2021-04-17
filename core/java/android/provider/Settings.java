@@ -5484,12 +5484,6 @@ public static final String THEMING_SETTINGS_DASHBOARD_ICONS =
         public static final String QS_MEDIA_PLAYER = "qs_media_player";
 
         /**
-         * FOD recognizing animation
-         * @hide
-         */
-        public static final String FOD_RECOGNIZING_ANIMATION = "fod_recognizing_animation";
-
-        /**
          * Change quick settings tiles animation style
          *
          * @hide
