@@ -40,10 +40,6 @@
     <!-- The minimum bottom margin of the keyguard security container -->
     <dimen name="kg_security_container_min_bottom_margin">0dp</dimen>
 
-    <!-- Color of the FOD view -->
-    <color name="config_fodColor">#00ff00</color>
-    <color name="config_fodColorBackground">#20000000</color>
-
     <!-- System icon area layout weight -->
     <item name="system_icon_area_weight" format="float" type="integer">1</item>
 
