@@ -5502,12 +5502,6 @@ public static final String THEMING_SETTINGS_DASHBOARD_ICONS =
         public static final String FOD_COLOR = "fod_color";
 
         /**
-         * FOD night light
-         * @hide
-         */
-        public static final String FOD_NIGHT_LIGHT = "fod_night_light";
-
-        /**
          * FOD recognizing animation
          * @hide
          */
