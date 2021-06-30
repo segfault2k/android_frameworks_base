@@ -604,7 +604,7 @@ public final class Zygote {
     static Runnable forkUsap(LocalServerSocket usapPoolSocket,
                              int[] sessionSocketRawFDs,
                              boolean isPriorityFork) {
-        FileDescriptor[] pipeFDs = null;
+        FileDescriptor[] pipeFDs;
 
         try {
             pipeFDs = Os.pipe2(O_CLOEXEC);
@@ -765,6 +765,9 @@ public final class Zygote {
                                  args.mBindMountAppDataDirs, args.mBindMountAppStorageDirs);
 
             Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);
+
+            // Set the Java Language thread priority to the default value for new apps.
+            Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
 
             return ZygoteInit.zygoteInit(args.mTargetSdkVersion,
                                          args.mDisabledCompatChanges,

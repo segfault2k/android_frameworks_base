@@ -140,12 +140,6 @@ public class QuickQSPanel extends QSPanel {
     }
 
     @Override
-    public void setListening(boolean listening) {
-        super.setListening(listening);
-        setBrightnessListening(listening);
-    }
-
-    @Override
     public void setContentMargins(int startMargin, int endMargin) {
         super.setContentMargins(startMargin, endMargin);
         View tilesView = (View) mTileLayout;
@@ -195,11 +189,12 @@ public class QuickQSPanel extends QSPanel {
         }
     }
 
-
-   @Override
-   public void updateViewVisibilityForTuningValue(boolean visible) {
-        super.updateViewVisibilityForTuningValue(false);
-
+    @Override
+    public void onTuningChanged(String key, String newValue) {
+        if (QS_SHOW_BRIGHTNESS_SLIDER_EXPANDED.equals(key)) {
+            // No Brightness or Tooltip for you!
+            super.onTuningChanged(key, "0");
+        }
     }
 
     @Override

@@ -499,6 +499,9 @@ class ZygoteConnection {
 
         Zygote.setAppProcessName(parsedArgs, TAG);
 
+        // Set the Java Language thread priority to the default value for new apps.
+        Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
+
         // End of the postFork event.
         Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);
         if (parsedArgs.mInvokeWith != null) {
@@ -515,8 +518,8 @@ class ZygoteConnection {
                         parsedArgs.mDisabledCompatChanges,
                         parsedArgs.mRemainingArgs, null /* classLoader */);
             } else {
-                return ZygoteInit.childZygoteInit(parsedArgs.mTargetSdkVersion,
-                        parsedArgs.mRemainingArgs, null /* classLoader */);
+                return ZygoteInit.childZygoteInit(
+                        parsedArgs.mRemainingArgs  /* classLoader */);
             }
         }
     }

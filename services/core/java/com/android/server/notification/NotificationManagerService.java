@@ -7051,20 +7051,24 @@ public class NotificationManagerService extends SystemService {
     }
 
     private void forceShowLed(int color) {
-        if (color != -1) {
-            mNotificationLight.turnOff();
-            mNotificationLight.setColor(color);
-        } else {
-            mNotificationLight.turnOff();
+        if (mNotificationLight != null) {
+            if (color != -1) {
+                mNotificationLight.turnOff();
+                mNotificationLight.setColor(color);
+            } else {
+                mNotificationLight.turnOff();
+            }
         }
     }
 
     private void forcePulseLed(int color, int onTime, int offTime) {
-        if (color != -1) {
-            mNotificationLight.turnOff();
-            mNotificationLight.setFlashing(color, LogicalLight.LIGHT_FLASH_TIMED, onTime, offTime);
-        } else {
-            mNotificationLight.turnOff();
+        if (mNotificationLight != null) {
+            if (color != -1) {
+                mNotificationLight.turnOff();
+                mNotificationLight.setFlashing(color, LogicalLight.LIGHT_FLASH_TIMED, onTime, offTime);
+            } else {
+                mNotificationLight.turnOff();
+            }
         }
     }
 
@@ -7780,6 +7784,21 @@ public class NotificationManagerService extends SystemService {
             @NotificationListenerService.NotificationCancelReason int reason,
             int rank, int count, boolean wasPosted, String listenerName) {
         final String canceledKey = r.getKey();
+
+        // Get pending intent used to create alarm, use FLAG_NO_CREATE if PendingIntent
+        // does not already exist, then null will be returned.
+        final PendingIntent pi = PendingIntent.getBroadcast(getContext(),
+                REQUEST_CODE_TIMEOUT,
+                new Intent(ACTION_NOTIFICATION_TIMEOUT)
+                        .setData(new Uri.Builder().scheme(SCHEME_TIMEOUT)
+                                .appendPath(r.getKey()).build())
+                        .addFlags(Intent.FLAG_RECEIVER_FOREGROUND),
+                PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_IMMUTABLE);
+
+        // Cancel alarm corresponding to pi.
+        if (pi != null) {
+            mAlarmManager.cancel(pi);
+        }
 
         // Record caller.
         recordCallerLocked(r);

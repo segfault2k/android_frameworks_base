@@ -4068,11 +4068,10 @@ public final class Settings {
         public static final int SCREEN_BRIGHTNESS_MODE_AUTOMATIC = 1;
 
 	/**
-         * Indicates whether we should only show the app lock view when the device is woken up
-         * Or always.
+	 * APP_LOCK_LOCK_AFTER key for user selected app lock timeout
          * @hide
          */
-        public static final String APP_LOCK_SHOW_ONLY_ON_WAKE = "app_lock_show_only_on_wake";
+	public static final String APP_LOCK_LOCK_AFTER = "applock_lock_after";
 
         /**
          * Control whether to enable adaptive sleep mode.
@@ -4521,6 +4520,12 @@ public final class Settings {
          * @hide
          */
         public static final String TOUCHSCREEN_GESTURE_HAPTIC_FEEDBACK = "touchscreen_gesture_haptic_feedback";
+        /**
+         * Show the pending notification counts as overlays on the status bar
+         * @hide
+         */
+        public static final String STATUS_BAR_NOTIF_COUNT = "status_bar_notif_count";
+
         /**
          * Control whether the accelerometer will be used to change screen
          * orientation.  If 0, it will not be used unless explicitly requested
@@ -5014,31 +5019,6 @@ public final class Settings {
          * @hide
          */
         public static final String BATTERY_LIGHT_REALLYFULL_COLOR = "battery_light_reallyfull_color";
-
-        /**
-         * Whether to show QS brightness slider
-         * @hide
-         */
-        public static final String QS_SHOW_BRIGHTNESS = "qs_show_brightness";
-
-        /**
-         * Whether to show QS brightness slider on bottom
-         * @hide
-         */
-        public static final String QS_BRIGHTNESS_POSITION_BOTTOM = "qs_brightness_position_bottom";
-
-        /**
-         * Whether to show QS brightness slider above qs footer
-         * Only applies when {@link QS_BRIGHTNESS_POSITION_BOTTOM} is enabled
-         * @hide
-         */
-        public static final String QS_SHOW_BRIGHTNESS_ABOVE_FOOTER = "qs_show_brightness_above_footer";
-
-        /**
-         * Whether to show the brighness slider auto brightness toggle
-         * @hide
-         */
-        public static final String QS_SHOW_AUTO_BRIGHTNESS = "qs_show_auto_brightness";
 
         /**
          * Set edge gesture Y dead zone
@@ -5822,11 +5802,7 @@ public static final String THEMING_SETTINGS_DASHBOARD_ICONS =
          */
         public static final String HEADS_UP_STOPLIST_VALUES = "heads_up_stoplist_values";
 
-        /** reTicker **/
-        public static final String RETICKER_STATUS = "reticker_status";
-        public static final String RETICKER_COLORED = "reticker_colored";
-
-        /**
+         /**
          * Which applications to disable heads up notifications for
          *
          * @hide
@@ -5861,6 +5837,15 @@ public static final String THEMING_SETTINGS_DASHBOARD_ICONS =
          * @hide
          */
         public static final String DOZE_BRIGHTNESS_FORCE = "doze_brightness_force";
+
+       /**
+         * 0 - Default
+         * 1 - Round with ring
+         * 2 - Two-toned round with ring
+         * 3 - Squircle with ring
+         * @hide
+         */
+        public static final String QS_TILE_STYLE = "qs_tile_style";
 
         /**
          * Keys we no longer back up under the current schema, but want to continue to
@@ -6024,6 +6009,7 @@ public static final String THEMING_SETTINGS_DASHBOARD_ICONS =
             PRIVATE_SETTINGS.add(ANIM_TILE_STYLE);
             PRIVATE_SETTINGS.add(ANIM_TILE_DURATION);
             PRIVATE_SETTINGS.add(BACK_GESTURE_HAPTIC);
+            PRIVATE_SETTINGS.add(QS_TILE_STYLE);
         }
 
         /**
@@ -10112,6 +10098,14 @@ public static final String THEMING_SETTINGS_DASHBOARD_ICONS =
         public static final String MEDIA_CONTROLS_RESUME = "qs_media_resumption";
 
         /**
+         * Controls which packages are blocked from persisting in media controls when resumption is
+         * enabled. The list of packages is set by the user in the Settings app.
+         * @see Settings.Secure#MEDIA_CONTROLS_RESUME
+         * @hide
+         */
+        public static final String MEDIA_CONTROLS_RESUME_BLOCKED = "qs_media_resumption_blocked";
+
+        /**
          * Controls if window magnification is enabled.
          * @hide
          */
@@ -10163,6 +10157,13 @@ public static final String THEMING_SETTINGS_DASHBOARD_ICONS =
          * @hide
          */
         public static final String LOCKSCREEN_VISUALIZER_ENABLED = "lockscreen_visualizer_enabled";
+
+	/**
+	 * Whether to show QS brightness slider on bottom
+         * @hide
+         */
+        public static final String QS_BRIGHTNESS_POSITION_BOTTOM = "qs_brightness_position_bottom";
+
         /**
          * Whether to vibrate when quick settings tile is pressed.
          *
@@ -10202,6 +10203,26 @@ public static final String THEMING_SETTINGS_DASHBOARD_ICONS =
          * @hide
          */
         public static final String SHOW_BACK_ARROW_GESTURE = "show_back_arrow_gesture";
+
+	/**
+	 * Whether to show qs brightness slider in quickbar
+         * @hide
+         */
+        public static final String QS_SHOW_AUTO_BRIGHTNESS =
+                "qs_show_auto_brightness";
+
+        /**
+         * @hide
+         */
+        public static final String QS_SHOW_BRIGHTNESS_SLIDER =
+                "qs_show_brightness_slider";
+
+	/**
+         * Whether to show qs brightness slider when qs is expanded
+         * @hide
+         */
+        public static final String QS_SHOW_BRIGHTNESS_SLIDER_EXPANDED =
+                "qs_show_brightness_slider_show_expanded";
 
         /**
          * Keys we no longer back up under the current schema, but want to continue to

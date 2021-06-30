@@ -571,8 +571,12 @@ class BluetoothManagerService extends IBluetoothManager.Stub {
         }
         // waive WRITE_SECURE_SETTINGS permission check
         long callingIdentity = Binder.clearCallingIdentity();
-        Settings.Global.putInt(mContext.getContentResolver(), Settings.Global.BLUETOOTH_ON, value);
-        Binder.restoreCallingIdentity(callingIdentity);
+        try {
+            Settings.Global.putInt(mContext.getContentResolver(),
+                    Settings.Global.BLUETOOTH_ON, value);
+        } finally {
+            Binder.restoreCallingIdentity(callingIdentity);
+        }
     }
 
     /**
@@ -2382,6 +2386,7 @@ class BluetoothManagerService extends IBluetoothManager.Stub {
                     Slog.d(TAG, "Bluetooth is complete send Service Down");
                 }
                 sendBluetoothServiceDownCallback();
+                sendBluetoothStateCallback(false);
                 unbindAndFinish();
                 sendBleStateChanged(prevState, newState);
                 // Don't broadcast as it has already been broadcast before

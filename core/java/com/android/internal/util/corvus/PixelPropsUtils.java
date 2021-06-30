@@ -38,7 +38,6 @@ public class PixelPropsUtils {
         "com.breel.wallpapers20",
         "com.google.android.apps.customization.pixel",
         "com.google.android.apps.fitness",
-        "com.google.android.apps.photos",
         "com.google.android.apps.recorder",
         "com.google.android.apps.subscriptions.red",
         "com.google.android.apps.tachyon",
@@ -115,7 +114,7 @@ public class PixelPropsUtils {
                 setPropValue(key, value);
             }
         }
-        if (Arrays.asList(packagesToChangePixel3XL).contains(packageName)) {
+	if (Arrays.asList(packagesToChangePixel3XL).contains(packageName)) {
             if (DEBUG) {
                 Log.d(TAG, "Defining props for: " + packageName);
             }

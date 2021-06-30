@@ -38,6 +38,10 @@ import com.android.systemui.statusbar.policy.KeyButtonView;
 import java.util.ArrayList;
 
 public class OpaLayout extends FrameLayout implements ButtonInterface {
+
+    private static final int OPA_FADE_IN_DURATION = 50;
+    private static final int OPA_FADE_OUT_DURATION = 250;
+
     private final Interpolator HOME_DISAPPEAR_INTERPOLATOR;
     private final ArrayList<View> mAnimatedViews;
     private int mAnimationState;
@@ -53,7 +57,6 @@ public class OpaLayout extends FrameLayout implements ButtonInterface {
     private AnimatorSet mGestureLineSet;
     private int mGestureState;
     private View mGreen;
-    private ImageView mHalo;
     private KeyButtonView mHome;
     private int mHomeDiameter;
     private boolean mIsPressed;
@@ -72,7 +75,6 @@ public class OpaLayout extends FrameLayout implements ButtonInterface {
     private int mTouchDownX;
     private int mTouchDownY;
     private ImageView mWhite;
-    private ImageView mWhiteCutout;
     private boolean mWindowVisible;
     private View mYellow;
 
@@ -97,6 +99,7 @@ public class OpaLayout extends FrameLayout implements ButtonInterface {
             public void run() {
                 cancelCurrentAnimation("retract");
                 startRetractAnimation();
+                hideAllOpa();
             }
         };
         mOverviewProxyListener = new OverviewProxyService.OverviewProxyListener() {
@@ -128,22 +131,15 @@ public class OpaLayout extends FrameLayout implements ButtonInterface {
         mYellow = findViewById(R.id.yellow);
         mGreen = findViewById(R.id.green);
         mWhite = (ImageView) findViewById(R.id.white);
-        mWhiteCutout = (ImageView) findViewById(R.id.white_cutout);
-        mHalo = (ImageView) findViewById(R.id.halo);
         mHome = (KeyButtonView) findViewById(R.id.home_button);
-        mHalo.setImageDrawable(KeyButtonDrawable.create(new ContextThemeWrapper(getContext(), R.style.DualToneLightTheme), new ContextThemeWrapper(getContext(), R.style.DualToneDarkTheme), R.drawable.halo, true, null));
         mHomeDiameter = mResources.getDimensionPixelSize(R.dimen.opa_disabled_home_diameter);
-        Paint paint = new Paint();
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OUT));
-        mWhiteCutout.setLayerType(2, paint);
         mAnimatedViews.add(mBlue);
         mAnimatedViews.add(mRed);
         mAnimatedViews.add(mYellow);
         mAnimatedViews.add(mGreen);
         mAnimatedViews.add(mWhite);
-        mAnimatedViews.add(mWhiteCutout);
-        mAnimatedViews.add(mHalo);
         mOverviewProxyService = (OverviewProxyService) Dependency.get(OverviewProxyService.class);
+        hideAllOpa();
     }
 
     @Override
@@ -238,7 +234,6 @@ public class OpaLayout extends FrameLayout implements ButtonInterface {
     @Override
     public void setImageDrawable(Drawable drawable) {
         mWhite.setImageDrawable(drawable);
-        mWhiteCutout.setImageDrawable(drawable);
     }
 
     @Override
@@ -327,6 +322,7 @@ public class OpaLayout extends FrameLayout implements ButtonInterface {
     }
 
     private void startAll(ArraySet<Animator> arraySet) {
+        showAllOpa();
         for (int size = arraySet.size() - 1; size >= 0; size--) {
             arraySet.valueAt(size).start();
         }
@@ -359,11 +355,6 @@ public class OpaLayout extends FrameLayout implements ButtonInterface {
         arraySet.add(getPropertyAnimator(mRight, FrameLayout.SCALE_Y, 0.8f, 200, Interpolators.FAST_OUT_SLOW_IN));
         arraySet.add(getPropertyAnimator(mWhite, FrameLayout.SCALE_X, 0.625f, 200, Interpolators.FAST_OUT_SLOW_IN));
         arraySet.add(getPropertyAnimator(mWhite, FrameLayout.SCALE_Y, 0.625f, 200, Interpolators.FAST_OUT_SLOW_IN));
-        arraySet.add(getPropertyAnimator(mWhiteCutout, FrameLayout.SCALE_X, 0.625f, 200, Interpolators.FAST_OUT_SLOW_IN));
-        arraySet.add(getPropertyAnimator(mWhiteCutout, FrameLayout.SCALE_Y, 0.625f, 200, Interpolators.FAST_OUT_SLOW_IN));
-        arraySet.add(getPropertyAnimator(mHalo, FrameLayout.SCALE_X, 0.47619048f, 100, Interpolators.FAST_OUT_SLOW_IN));
-        arraySet.add(getPropertyAnimator(mHalo, FrameLayout.SCALE_Y, 0.47619048f, 100, Interpolators.FAST_OUT_SLOW_IN));
-        arraySet.add(getPropertyAnimator(mHalo, View.ALPHA, 0.0f, 100, Interpolators.FAST_OUT_SLOW_IN));
         getLongestAnim(arraySet).addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animator) {
@@ -408,11 +399,6 @@ public class OpaLayout extends FrameLayout implements ButtonInterface {
         arraySet.add(getPropertyAnimator(mYellow, FrameLayout.SCALE_Y, 1.0f, 190, OpaUtils.INTERPOLATOR_40_OUT));
         arraySet.add(getPropertyAnimator(mWhite, FrameLayout.SCALE_X, 1.0f, 190, OpaUtils.INTERPOLATOR_40_OUT));
         arraySet.add(getPropertyAnimator(mWhite, FrameLayout.SCALE_Y, 1.0f, 190, OpaUtils.INTERPOLATOR_40_OUT));
-        arraySet.add(getPropertyAnimator(mWhiteCutout, FrameLayout.SCALE_X, 1.0f, 190, OpaUtils.INTERPOLATOR_40_OUT));
-        arraySet.add(getPropertyAnimator(mWhiteCutout, FrameLayout.SCALE_Y, 1.0f, 190, OpaUtils.INTERPOLATOR_40_OUT));
-        arraySet.add(getPropertyAnimator(mHalo, FrameLayout.SCALE_X, 1.0f, 190, Interpolators.FAST_OUT_SLOW_IN));
-        arraySet.add(getPropertyAnimator(mHalo, FrameLayout.SCALE_Y, 1.0f, 190, Interpolators.FAST_OUT_SLOW_IN));
-        arraySet.add(getPropertyAnimator(mHalo, FrameLayout.ALPHA, 1.0f, 190, Interpolators.FAST_OUT_SLOW_IN));
         getLongestAnim(arraySet).addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animator) {
@@ -477,25 +463,10 @@ public class OpaLayout extends FrameLayout implements ButtonInterface {
         arraySet.add(getPropertyAnimator(mGreen, FrameLayout.SCALE_Y, 1.0f, 200, OpaUtils.INTERPOLATOR_40_OUT));
         Animator propertyAnimator = getPropertyAnimator(mWhite, FrameLayout.SCALE_X, 1.0f, 150, Interpolators.FAST_OUT_SLOW_IN);
         Animator propertyAnimator2 = getPropertyAnimator(mWhite, FrameLayout.SCALE_Y, 1.0f, 150, Interpolators.FAST_OUT_SLOW_IN);
-        Animator propertyAnimator3 = getPropertyAnimator(mWhiteCutout, FrameLayout.SCALE_X, 1.0f, 150, Interpolators.FAST_OUT_SLOW_IN);
-        Animator propertyAnimator4 = getPropertyAnimator(mWhiteCutout, FrameLayout.SCALE_Y, 1.0f, 150, Interpolators.FAST_OUT_SLOW_IN);
-        Animator propertyAnimator5 = getPropertyAnimator(mHalo, FrameLayout.SCALE_X, 1.0f, 150, Interpolators.FAST_OUT_SLOW_IN);
-        Animator propertyAnimator6 = getPropertyAnimator(mHalo, FrameLayout.SCALE_Y, 1.0f, 150, Interpolators.FAST_OUT_SLOW_IN);
-        Animator propertyAnimator7 = getPropertyAnimator(mHalo, FrameLayout.ALPHA, 1.0f, 150, Interpolators.FAST_OUT_SLOW_IN);
         propertyAnimator.setStartDelay(33);
         propertyAnimator2.setStartDelay(33);
-        propertyAnimator3.setStartDelay(33);
-        propertyAnimator4.setStartDelay(33);
-        propertyAnimator5.setStartDelay(33);
-        propertyAnimator6.setStartDelay(33);
-        propertyAnimator7.setStartDelay(33);
         arraySet.add(propertyAnimator);
         arraySet.add(propertyAnimator2);
-        arraySet.add(propertyAnimator3);
-        arraySet.add(propertyAnimator4);
-        arraySet.add(propertyAnimator5);
-        arraySet.add(propertyAnimator6);
-        arraySet.add(propertyAnimator7);
         getLongestAnim(arraySet).addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animator) {
@@ -551,10 +522,6 @@ public class OpaLayout extends FrameLayout implements ButtonInterface {
         }
         arraySet.add(getPropertyAnimator(mWhite, FrameLayout.SCALE_X, 0.0f, 83, HOME_DISAPPEAR_INTERPOLATOR));
         arraySet.add(getPropertyAnimator(mWhite, FrameLayout.SCALE_Y, 0.0f, 83, HOME_DISAPPEAR_INTERPOLATOR));
-        arraySet.add(getPropertyAnimator(mWhiteCutout, FrameLayout.SCALE_X, 0.0f, 83, HOME_DISAPPEAR_INTERPOLATOR));
-        arraySet.add(getPropertyAnimator(mWhiteCutout, FrameLayout.SCALE_Y, 0.0f, 83, HOME_DISAPPEAR_INTERPOLATOR));
-        arraySet.add(getPropertyAnimator(mHalo, FrameLayout.SCALE_X, 0.0f, 83, HOME_DISAPPEAR_INTERPOLATOR));
-        arraySet.add(getPropertyAnimator(mHalo, FrameLayout.SCALE_Y, 0.0f, 83, HOME_DISAPPEAR_INTERPOLATOR));
         getLongestAnim(arraySet).addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animator) {
@@ -600,8 +567,7 @@ public class OpaLayout extends FrameLayout implements ButtonInterface {
         boolean shouldShowSwipeUpUI = mOverviewProxyService.shouldShowSwipeUpUI();
         boolean z = true;
         boolean z2 = mOpaEnabled && !shouldShowSwipeUpUI;
-        mHalo.setVisibility(z2 ? 0 : 4);
-        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) mHalo.getLayoutParams();
+        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) mWhite.getLayoutParams();
         if (z2 || shouldShowSwipeUpUI) {
             z = false;
         }
@@ -609,10 +575,8 @@ public class OpaLayout extends FrameLayout implements ButtonInterface {
         layoutParams.width = i;
         layoutParams.height = i;
         mWhite.setLayoutParams(layoutParams);
-        mWhiteCutout.setLayoutParams(layoutParams);
         ImageView.ScaleType scaleType = z ? ImageView.ScaleType.FIT_CENTER : ImageView.ScaleType.CENTER;
         mWhite.setScaleType(scaleType);
-        mWhiteCutout.setScaleType(scaleType);
     }
 
     private void cancelCurrentAnimation(String str) {
@@ -677,9 +641,7 @@ public class OpaLayout extends FrameLayout implements ButtonInterface {
             view.setTranslationX(0.0f);
             view.setAlpha(0.0f);
         }
-        mHalo.setAlpha(1.0f);
         mWhite.setAlpha(1.0f);
-        mWhiteCutout.setAlpha(1.0f);
         mAnimationState = 0;
         mGestureState = 0;
     }
@@ -712,9 +674,7 @@ public class OpaLayout extends FrameLayout implements ButtonInterface {
         if (mWhite.getDrawable() instanceof KeyButtonDrawable) {
             ((KeyButtonDrawable) mWhite.getDrawable()).setDarkIntensity(f);
         }
-        ((KeyButtonDrawable) mHalo.getDrawable()).setDarkIntensity(f);
         mWhite.invalidate();
-        mHalo.invalidate();
         mHome.setDarkIntensity(f);
     }
 
@@ -733,11 +693,8 @@ public class OpaLayout extends FrameLayout implements ButtonInterface {
         }
         mGestureLineSet = new AnimatorSet();
         ObjectAnimator scaleObjectAnimator = OpaUtils.getScaleObjectAnimator(mWhite, 0.0f, 100, OpaUtils.INTERPOLATOR_40_OUT);
-        ObjectAnimator scaleObjectAnimator2 = OpaUtils.getScaleObjectAnimator(mWhiteCutout, 0.0f, 100, OpaUtils.INTERPOLATOR_40_OUT);
-        ObjectAnimator scaleObjectAnimator3 = OpaUtils.getScaleObjectAnimator(mHalo, 0.0f, 100, OpaUtils.INTERPOLATOR_40_OUT);
         scaleObjectAnimator.setStartDelay(50);
-        scaleObjectAnimator2.setStartDelay(50);
-        mGestureLineSet.play(scaleObjectAnimator).with(scaleObjectAnimator2).with(scaleObjectAnimator3);
+        mGestureLineSet.play(scaleObjectAnimator);
         mGestureLineSet.play(OpaUtils.getScaleObjectAnimator(mTop, 0.8f, 200, Interpolators.FAST_OUT_SLOW_IN)).with(scaleObjectAnimator).with(OpaUtils.getAlphaObjectAnimator(mRed, 1.0f, 50, 130, Interpolators.LINEAR)).with(OpaUtils.getAlphaObjectAnimator(mYellow, 1.0f, 50, 130, Interpolators.LINEAR)).with(OpaUtils.getAlphaObjectAnimator(mBlue, 1.0f, 50, 113, Interpolators.LINEAR)).with(OpaUtils.getAlphaObjectAnimator(mGreen, 1.0f, 50, 113, Interpolators.LINEAR)).with(OpaUtils.getScaleObjectAnimator(mBottom, 0.8f, 200, Interpolators.FAST_OUT_SLOW_IN)).with(OpaUtils.getScaleObjectAnimator(mLeft, 0.8f, 200, Interpolators.FAST_OUT_SLOW_IN)).with(OpaUtils.getScaleObjectAnimator(mRight, 0.8f, 200, Interpolators.FAST_OUT_SLOW_IN));
         if (mIsVertical) {
             ObjectAnimator translationObjectAnimatorY = OpaUtils.getTranslationObjectAnimatorY(mRed, OpaUtils.INTERPOLATOR_40_40, OpaUtils.getPxVal(mResources, R.dimen.opa_line_x_trans_ry), mRed.getY() + OpaUtils.getDeltaDiamondPositionLeftY(), 350);
@@ -747,7 +704,7 @@ public class OpaLayout extends FrameLayout implements ButtonInterface {
                     startCollapseAnimation();
                 }
             });
-            mGestureLineSet.play(translationObjectAnimatorY).with(scaleObjectAnimator3).with(OpaUtils.getTranslationObjectAnimatorY(mBlue, OpaUtils.INTERPOLATOR_40_40, OpaUtils.getPxVal(mResources, R.dimen.opa_line_x_trans_bg), mBlue.getY() + OpaUtils.getDeltaDiamondPositionBottomY(mResources), 350)).with(OpaUtils.getTranslationObjectAnimatorY(mYellow, OpaUtils.INTERPOLATOR_40_40, -OpaUtils.getPxVal(mResources, R.dimen.opa_line_x_trans_ry), mYellow.getY() + OpaUtils.getDeltaDiamondPositionRightY(), 350)).with(OpaUtils.getTranslationObjectAnimatorY(mGreen, OpaUtils.INTERPOLATOR_40_40, -OpaUtils.getPxVal(mResources, R.dimen.opa_line_x_trans_bg), mGreen.getY() + OpaUtils.getDeltaDiamondPositionTopY(mResources), 350));
+            mGestureLineSet.play(translationObjectAnimatorY).with(OpaUtils.getTranslationObjectAnimatorY(mBlue, OpaUtils.INTERPOLATOR_40_40, OpaUtils.getPxVal(mResources, R.dimen.opa_line_x_trans_bg), mBlue.getY() + OpaUtils.getDeltaDiamondPositionBottomY(mResources), 350)).with(OpaUtils.getTranslationObjectAnimatorY(mYellow, OpaUtils.INTERPOLATOR_40_40, -OpaUtils.getPxVal(mResources, R.dimen.opa_line_x_trans_ry), mYellow.getY() + OpaUtils.getDeltaDiamondPositionRightY(), 350)).with(OpaUtils.getTranslationObjectAnimatorY(mGreen, OpaUtils.INTERPOLATOR_40_40, -OpaUtils.getPxVal(mResources, R.dimen.opa_line_x_trans_bg), mGreen.getY() + OpaUtils.getDeltaDiamondPositionTopY(mResources), 350));
         } else {
             ObjectAnimator translationObjectAnimatorX = OpaUtils.getTranslationObjectAnimatorX(mRed, OpaUtils.INTERPOLATOR_40_40, -OpaUtils.getPxVal(mResources, R.dimen.opa_line_x_trans_ry), mRed.getX() + OpaUtils.getDeltaDiamondPositionTopX(), 350);
             translationObjectAnimatorX.addListener(new AnimatorListenerAdapter() {
@@ -766,5 +723,45 @@ public class OpaLayout extends FrameLayout implements ButtonInterface {
         ofFloat.setDuration((long) i);
         ofFloat.setInterpolator(interpolator);
         return ofFloat;
+    }
+
+    private void hideAllOpa() {
+        fadeOutButton(mBlue);
+        fadeOutButton(mRed);
+        fadeOutButton(mYellow);
+        fadeOutButton(mGreen);
+    }
+
+    private void showAllOpa() {
+        fadeInButton(mBlue);
+        fadeInButton(mRed);
+        fadeInButton(mYellow);
+        fadeInButton(mGreen);
+    }
+
+    private void fadeInButton(View viewToFade){
+        if (viewToFade == null) return;
+        ObjectAnimator animator = ObjectAnimator.ofFloat(viewToFade, View.ALPHA, 0.0f, 1.0f);
+        animator.setDuration(OpaLayout.OPA_FADE_IN_DURATION); //ms
+        animator.start();
+        animator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                viewToFade.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    private void fadeOutButton(View viewToFade){
+        if (viewToFade == null) return;
+        ObjectAnimator animator = ObjectAnimator.ofFloat(viewToFade, View.ALPHA, 1.0f, 0.0f);
+        animator.setDuration(OpaLayout.OPA_FADE_OUT_DURATION); //ms
+        animator.start();
+        animator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                viewToFade.setVisibility(View.INVISIBLE);
+            }
+        });
     }
 }
