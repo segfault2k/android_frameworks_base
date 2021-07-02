@@ -5261,11 +5261,6 @@ public final class Settings {
         public static final String LOCKSCREEN_MEDIA_BLUR = "lockscreen_media_blur";
 
         /**
-         * @hide
-         */
-        public static final String QS_TILE_STYLE = "qs_tile_style";
-
-        /**
          * Whether to show charging animation
          * @hide
          */
