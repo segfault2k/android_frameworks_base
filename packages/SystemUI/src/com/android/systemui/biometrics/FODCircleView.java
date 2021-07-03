@@ -409,9 +409,7 @@ public class FODCircleView extends ImageView {
                 mWindowManager.updateViewLayout(mPressedView, mPressedParams);
             }
         } else {
-            if (mShouldBoostBrightness) {
-                mPressedParams.screenBrightness = 0.0f;
-            }
+            mPressedParams.screenBrightness = 0.0f;
             mPressedParams.dimAmount = 0.0f;
             if (mPressedView.getParent() != null) {
                 mWindowManager.removeView(mPressedView);
