@@ -64,9 +64,6 @@ public class FODCircleView extends ImageView {
     private int mDreamingOffsetX;
     private int mDreamingOffsetY;
 
-    private int mColor;
-    private int mColorBackground;
-
     private boolean mIsBouncer;
     private boolean mIsDreaming;
     private boolean mIsShowing;
@@ -125,8 +122,6 @@ public class FODCircleView extends ImageView {
     public FODCircleView(Context context) {
         super(context);
 
-        setScaleType(ScaleType.CENTER);
-
         IFingerprintInscreen daemon = getFingerprintInScreenDaemon();
         if (daemon == null) {
             throw new RuntimeException("Unable to get IFingerprintInscreen");
@@ -143,11 +138,8 @@ public class FODCircleView extends ImageView {
 
         Resources res = context.getResources();
 
-        mColor = res.getColor(R.color.config_fodColor);
-        mColorBackground = res.getColor(R.color.config_fodColorBackground);
-
         mPaintFingerprint.setAntiAlias(true);
-        mPaintFingerprint.setColor(mColorBackground);
+        mPaintFingerprint.setColor(res.getColor(R.color.config_fodColor));
 
         mWindowManager = context.getSystemService(WindowManager.class);
 
@@ -180,8 +172,11 @@ public class FODCircleView extends ImageView {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        canvas.drawCircle(mSize / 2, mSize / 2, mSize / 2.0f, mPaintFingerprint);
         super.onDraw(canvas);
+
+        if (mIsCircleShowing) {
+            canvas.drawCircle(mSize / 2, mSize / 2, mSize / 2.0f, mPaintFingerprint);
+        }
     }
 
     @Override
@@ -271,7 +266,6 @@ public class FODCircleView extends ImageView {
         updateAlpha();
         dispatchPress();
 
-        mPaintFingerprint.setColor(mColor);
         setImageDrawable(null);
         invalidate();
     }
@@ -279,7 +273,6 @@ public class FODCircleView extends ImageView {
     public void hideCircle() {
         mIsCircleShowing = false;
 
-        mPaintFingerprint.setColor(mColorBackground);
         setImageResource(R.drawable.fod_icon_default);
         invalidate();
 
